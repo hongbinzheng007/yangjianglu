@@ -152,9 +152,7 @@ function showSection(i){
   CS.value=i;
 }
 
-function getVoice(){
-  var v=speechSynthesis.getVoices();
-  return v.find(function(x){return /kangkang/i.test(x.name)})||v.find(function(x){return x.lang.startsWith("zh")});
+function getVoice(){var v=speechSynthesis.getVoices();var kang=v.find(function(x){return /kangkang/i.test(x.name)&&x.lang.startsWith("zh")});if(kang)return kang;var zhMale=v.find(function(x){return x.lang.startsWith("zh")&&(/男|Male|yun|zhang|zhi|\u4e91\u53f0|\u8f89/i.test(x.name))});if(zhMale)return zhMale;var zh=v.find(function(x){return x.lang.startsWith("zh")});if(zh)return zh;var enMale=v.find(function(x){return /David|Mark/i.test(x.name)});if(enMale)return enMale;return null;})||v.find(function(x){return x.lang.startsWith("zh")});
 }
 
 // --- Speak ---
@@ -183,7 +181,7 @@ function speak(idx){
   if(voice)gUtterance.voice=voice;
   
   gStartTime=Date.now();
-  gUtterance.onstart=function(){ST.textContent="朗读中..."+(voice?"["+voice.name+"]":"")};
+  gUtterance.onstart=function(){ST.textContent="朗读中["+(voice?voice.name:"默认")+"]"};
   gUtterance.onend=function(){
     isPlaying=0;B.textContent="▶ 播放";B.className="btn btn-primary";
     PF.style.width="100%";CT.textContent=TT.textContent;
