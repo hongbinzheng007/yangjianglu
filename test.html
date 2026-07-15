@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>语音测试</title></head>
+<body style="font-family:sans-serif;background:#f5f0e8;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;text-align:center;">
+  <h2 style="color:#4a3728;">🔊 语音测试页面</h2>
+  <p id="status" style="color:#7a6a58;margin:20px;">点击按钮测试语音</p>
+  <button onclick="testSpeech()" style="padding:16px 40px;background:#4a3728;color:white;border:none;border-radius:12px;font-size:18px;cursor:pointer;">点击说话</button>
+  <div id="voices" style="margin-top:30px;font-size:13px;color:#7a6a58;"></div>
+  <script>
+    // List available voices
+    var vList = document.getElementById("voices");
+    function showVoices(){
+      var v = speechSynthesis.getVoices();
+      vList.innerHTML = "检测到 " + v.length + " 个语音：<br>" + 
+        v.map(function(vo){ return vo.name + " [" + vo.lang + "]" + (vo.localService?" 📍":" ☁️"); }).join("<br>");
+    }
+    speechSynthesis.onvoiceschanged = showVoices;
+    setTimeout(showVoices, 2000);
+    speechSynthesis.getVoices();
+
+    function testSpeech(){
+      var status = document.getElementById("status");
+      try {
+        var u = new SpeechSynthesisUtterance("各位师友好，我是郑红彬，欢迎了解近代洋匠录。");
+        u.lang = "zh-CN";
+        u.rate = 0.9;
+        // Try Kangkang
+        var allV = speechSynthesis.getVoices();
+        var kang = allV.find(function(v){ return /kangkang/i.test(v.name); });
+        if(kang) { u.voice = kang; status.textContent = "使用: " + kang.name; }
+        else { status.textContent = "使用默认中文语音"; }
+        u.onerror = function(e){ status.textContent = "语音出错: " + e.error; };
+        u.onend = function(){ status.textContent = "✅ 朗读完成"; };
+        speechSynthesis.cancel();
+        speechSynthesis.speak(u);
+        status.textContent = "正在朗读...如果听不到，请检查：1) 音量 2) 扬声器 3) 浏览器是否允许语音";
+      } catch(e) {
+        status.textContent = "错误: " + e.message;
+      }
+    }
+  </script>
+</body></html>
